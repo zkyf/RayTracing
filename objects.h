@@ -3,6 +3,10 @@
 #ifndef _LJX_OBJECTS_H
 #define _LJX_OBJECTS_H
 
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+
 struct Object
 {
 	virtual IntersectResult intersect(Ray ray) { return IntersectResult(); }
@@ -39,7 +43,47 @@ struct Triangle : public Object
 	virtual IntersectResult intersect(Ray ray)
 	{
 		IntersectResult result; result.hit = false;
+    Mat coe(3,3, CV_64F, Scalar::all(0));
+    Mat res(3,1,CV_64F, Scalar::all(0));
 
+    coe.at<double>(0, 0) = a.x - b.x;
+    coe.at<double>(0, 1) = a.x - c.x;
+    coe.at<double>(0, 2) = ray.dir.x;
+
+    coe.at<double>(1, 0) = a.y - b.y;
+    coe.at<double>(1, 1) = a.y - c.y;
+    coe.at<double>(1, 2) = ray.dir.y;
+
+    coe.at<double>(2, 0) = a.z - b.z;
+    coe.at<double>(2, 1) = a.z - c.z;
+    coe.at<double>(2, 2) = ray.dir.z;
+
+    res.at<double>(0, 0) = a.x - ray.from.x;
+    res.at<double>(1, 0) = a.y - ray.from.y;
+    res.at<double>(2, 0) = a.z - ray.from.z;
+
+    double deta = determinant(coe);
+    
+    coe.at<double>(0, 0) = res.at<double>(0, 0);
+    coe.at<double>(1, 0) = res.at<double>(1, 0);
+    coe.at<double>(2, 0) = res.at<double>(2, 0);
+    double beta = determinant(coe) / deta;
+
+    coe.at<double>(0, 0) = a.x - b.x;
+    coe.at<double>(0, 1) = a.x - c.x;
+    coe.at<double>(0, 2) = ray.dir.x;
+    coe.at<double>(0, 1) = res.at<double>(0, 0);
+    coe.at<double>(1, 1) = res.at<double>(1, 0);
+    coe.at<double>(2, 1) = res.at<double>(2, 0);
+    double gama = determinant(coe) / deta;
+
+    if (beta > 0 && gama > 0 && beta + gama < 1)
+    {
+      result.hit = true;
+      result.point = a + (b - a) * beta + (c - a) * gama;
+    }
+
+    return result;
 	}
 };
 
