@@ -30,6 +30,8 @@ struct Plane : public Object
 			result.hit = true;
 			double t = (o - ray.from)*normal / down;
 			result.point = ray.from + ray.dir*t;
+			result.distance = (ray.from - result.point).length();
+			result.normal = normal;
 		}
 		return result;
 	}
@@ -81,6 +83,8 @@ struct Triangle : public Object
     {
       result.hit = true;
       result.point = a + (b - a) * beta + (c - a) * gama;
+			result.distance = (ray.from - result.point).length();
+			result.normal = CrossProduct(b - a, c - a).unit();
     }
 
     return result;
@@ -92,6 +96,9 @@ struct Sphere : public Object
 	Vector center;
 	double radius;
 
+	Sphere(Vector _center = Vector(), double _radius = 1.0f) :
+		center(_center), radius(_radius) { if (radius < 0) radius = 0; }
+
 	virtual IntersectResult intersect(Ray ray)
 	{
 		IntersectResult result; result.hit = false;
@@ -101,8 +108,11 @@ struct Sphere : public Object
 		double distance = diff.length() * sinvalue;
 		if (cosvalue > 0 && distance < radius)
 		{
+			double d = diff*ray.dir.unit() - sqrt(radius*radius - distance * distance);
 			result.hit = true;
-			result.point = ray.from + (diff*ray.dir.unit()) * ray.dir;
+			result.point = ray.from + d * ray.dir;
+			result.distance = d;
+			result.normal = (result.point - center).unit();
 		}
 		return result;
 	}

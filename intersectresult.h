@@ -7,6 +7,8 @@ struct IntersectResult
 {
 	bool hit;
 	Vector point;
+	double distance;
+	Vector normal;
 
 	IntersectResult() : hit(false), point() {}
 };
