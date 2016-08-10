@@ -1,6 +1,7 @@
 #include <opencv2\opencv.hpp>
 #include <iostream>
 #include "vector.h"
+#include "ray.h"
 
 using namespace cv;
 using namespace std;
@@ -13,28 +14,27 @@ struct Camera
 	Vector pos;
 	Vector up;
 	Vector right;
-	int width, height;
-	int format;
+  double fov;
+  double fscale;
+  double front;
 
 	Camera(Vector _pos = Vector(0, 0, 0), Vector _up = Vector(0, 1, 0), Vector _right = Vector(1, 0, 0),
-				 int _width = 480, int _height = 480) :
-		pos(_pos.unit()), up(_up.unit()), right(_right.unit()), width(_width), height(_height), format(CV_8UC3) {}
+				 int _width = 480, int _height = 480, double _fov = 90.0f) :
+		pos(_pos), up(_up.unit()), right(_right.unit()), fov(_fov)
+  {
+    fscale = tan(fov* (M_PI  * 0.5f / 180)) * 2;
+  }
+
 	Vector dir() { return CrossProduct(up, right); }
-	virtual Mat shade();
-};
 
-struct PerspectiveCamera : public Camera
-{
-	virtual Mat shade()
-	{
-		Mat result = Mat(height, width, format, Scalar::all(0));
-
-	}
-};
-
-struct ParallelCamera : public Camera
-{
-
+  Ray genRay(double x, double y)
+  {
+    // The parameters are in the window coordinate system, with left-top as the origin
+    Ray ray;
+    ray.from = pos;
+    ray.dir = dir() + x*fscale * right + y*fscale*up;
+    return ray;
+  }
 };
 
 #endif

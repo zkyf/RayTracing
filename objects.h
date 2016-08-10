@@ -4,8 +4,10 @@
 #define _LJX_OBJECTS_H
 
 #include <opencv2/opencv.hpp>
-
 using namespace cv;
+
+#include <vector>
+using namespace std;
 
 struct Object
 {
@@ -116,6 +118,26 @@ struct Sphere : public Object
 		}
 		return result;
 	}
+};
+
+struct Item
+{
+  vector<Object*> parts;
+
+  IntersectResult intersect(Ray ray)
+  {
+    IntersectResult result; result.hit = false;
+    for (int i = 0; i < parts.size(); i++)
+    {
+      IntersectResult temp = parts[i]->intersect(ray);
+      if (temp.hit && (temp.distance < result.distance || result.hit == false))
+      {
+        result = temp;
+      }
+    }
+    return result;
+  }
+  void push(Object& obj) { parts.push_back(&obj); }
 };
 
 #endif

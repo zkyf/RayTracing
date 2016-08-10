@@ -11,5 +11,6 @@ By:   Jiaxin Liu
 #include "objects.h"
 #include "ray.h"
 #include "vector.h"
+#include "scene.h"
 
 #endif
