@@ -11,6 +11,8 @@ using namespace std;
 
 struct Object
 {
+  Vector kd;
+
 	virtual IntersectResult intersect(Ray ray) { return IntersectResult(); }
 };
 
@@ -34,6 +36,7 @@ struct Plane : public Object
 			result.point = ray.from + ray.dir*t;
 			result.distance = (ray.from - result.point).length();
 			result.normal = normal;
+      result.color = kd;
 		}
 		return result;
 	}
@@ -87,6 +90,7 @@ struct Triangle : public Object
       result.point = a + (b - a) * beta + (c - a) * gama;
 			result.distance = (ray.from - result.point).length();
 			result.normal = CrossProduct(b - a, c - a).unit();
+      result.color = kd;
     }
 
     return result;
@@ -115,6 +119,7 @@ struct Sphere : public Object
 			result.point = ray.from + d * ray.dir;
 			result.distance = d;
 			result.normal = (result.point - center).unit();
+      result.color = kd;
 		}
 		return result;
 	}

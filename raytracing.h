@@ -12,5 +12,6 @@ By:   Jiaxin Liu
 #include "ray.h"
 #include "vector.h"
 #include "scene.h"
+#include "light.h"
 
 #endif

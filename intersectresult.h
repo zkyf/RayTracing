@@ -9,6 +9,7 @@ struct IntersectResult
 	Vector point;
 	double distance;
 	Vector normal;
+  Vector color;
 
 	IntersectResult() : hit(false), point() {}
 };
