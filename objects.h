@@ -91,6 +91,21 @@ struct Sphere : public Object
 {
 	Vector center;
 	double radius;
+
+	virtual IntersectResult intersect(Ray ray)
+	{
+		IntersectResult result; result.hit = false;
+		Vector diff = center - ray.from;
+		double cosvalue = diff.unit() * ray.dir.unit();
+		double sinvalue = sqrt(1 - cosvalue*cosvalue);
+		double distance = diff.length() * sinvalue;
+		if (cosvalue > 0 && distance < radius)
+		{
+			result.hit = true;
+			result.point = ray.from + (diff*ray.dir.unit()) * ray.dir;
+		}
+		return result;
+	}
 };
 
 #endif
