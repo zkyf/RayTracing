@@ -11,7 +11,7 @@ using namespace std;
 
 struct Object
 {
-  Vector kd;
+  Color kd;
 
 	virtual IntersectResult intersect(Ray ray) { return IntersectResult(); }
 };

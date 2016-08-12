@@ -7,7 +7,7 @@
 struct PointLight
 {
   Vector pos;
-  Vector color;
+  double bri = 1.0;
 };
 
 #endif

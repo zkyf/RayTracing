@@ -4,6 +4,7 @@
 #include "objects.h"
 #include "camera.h"
 #include "light.h"
+#include "color.h"
 #include <iostream>
 #include <vector>
 
@@ -17,6 +18,7 @@ struct Scene
   Mat shade(int width, int height, Camera camera, double maxdepth = 5.0f)
   {
     Mat scene(height, width, CV_8UC3, Scalar::all(0));
+    //cvtColor(scene, scene, CV_BGR2RGB);
     double x = 0, y = 0;
     for (int i = 0; i < width; i++)
     {
@@ -36,13 +38,15 @@ struct Scene
             objectnum = k;
           }
         }
-        Vector color;
+        Color color;
         if (result.hit)
         {
           color = result.color;
         }
         if (lights.size()>0)
         {
+          color = Color();
+          Color thiscolor = result.color;
           for (int ln = 0; ln<lights.size(); ln++)
           {
             Ray shadowray;
@@ -55,15 +59,15 @@ struct Scene
               IntersectResult temp = items[in]->intersect(shadowray);
               if (temp.hit) { shadow = true; break; }
             }
-            if (shadow) color = Vector(0, 0, 0);
-            else color = color*(-1 * result.normal*shadowray.dir > 0 ? -1 * result.normal*shadowray.dir: 0);
+            if (!shadow)
+              color = color + thiscolor*(-1 * result.normal*shadowray.dir*lights[ln]->bri > 0 ? -1 * result.normal*shadowray.dir*lights[ln]->bri : 0);
           }
         }
         {
           double depth_color = (result.distance > maxdepth) ? 0 : 255 - result.distance * 255 / maxdepth;
-          scene.at<Vec3b>(j, i)[0] = color.x;
-          scene.at<Vec3b>(j, i)[1] = color.y;
-          scene.at<Vec3b>(j, i)[2] = color.z;
+          scene.at<Vec3b>(j, i)[0] = color.b;
+          scene.at<Vec3b>(j, i)[1] = color.g;
+          scene.at<Vec3b>(j, i)[2] = color.r;
         }
       }
     }

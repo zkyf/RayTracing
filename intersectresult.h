@@ -2,6 +2,7 @@
 #define _LJX_INTERSECTRESULT_H
 
 #include "ray.h"
+#include "color.h"
 
 struct IntersectResult
 {
@@ -9,7 +10,7 @@ struct IntersectResult
 	Vector point;
 	double distance;
 	Vector normal;
-  Vector color;
+  Color color;
 
 	IntersectResult() : hit(false), point() {}
 };
